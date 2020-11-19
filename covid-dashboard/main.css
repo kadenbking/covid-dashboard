@@ -1,0 +1,46 @@
+* {
+    font-family: 'Nunito Sans', sans-serif;
+}
+
+.jumbotron {
+    background-image: url("img/fhu_background.jpg");
+}
+
+h1 {
+    color: #800000;
+    font-family: 'Khand', sans-serif;
+}
+
+.bilboard h2 {
+    font-size: 4em;
+    font-weight: bold;
+}
+
+.bilboard h2.green {
+    color: #039307;
+}
+
+.bilboard h2.yellow {
+    color: #ffd300;
+}
+
+.bilboard h2.orange {
+    color: #d88201;
+}
+
+.bilboard h2.red {
+    color: #bb1b09;
+}
+
+#riskLevelInfo {
+    color: #a4a4a4;
+}
+
+#riskLevelInfo:hover {
+    color: #717171;
+}   
+
+footer {
+    background-image: url("img/fhu_background.jpg");
+    margin-top: 10vh;
+}

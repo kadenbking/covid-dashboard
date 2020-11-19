@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;600&family=Nunito+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://kit.fontawesome.com/7d5d561594.js" crossorigin="anonymous"></script>
+
+    <title>FHU Covid Data</title>
+  </head>
+  <body>
+
+    <div class="jumbotron jumbotron-fluid">
+      <div class="container">
+        <h1 class="display-4 text-center text-white">Freed-Hardeman University Covid Data</h1>
+        <!-- <p class="lead"></p> -->
+      </div>
+    </div>
+
+    <div class="container text-center bilboard">
+
+      <div class="row my-5">
+        <div class="col-md-3 my-3 student-cases">
+          <h2 id="active-cases-student"></h2>
+          <h5>Active Student Cases</h5>
+        </div>
+  
+        <div class="col-md-3 my-3 faculty-cases">
+          <h2 id="active-cases-faculty-staff"></h2>
+          <h5>Active Falculty/Staff Cases</h5>
+        </div>
+
+        <div class="col-md-3 my-3 isolated">
+          <h2 id="isolated"></h2>
+          <h5>Isolated</h5>
+        </div>
+
+        <div class="col-md-3 my-3 quarantined">
+          <h2 id="quarantined"></h2>
+          <h5>Quarantined</h5>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="source col mb-5">
+
+          <ul class="list-inline my-0">
+            <li class="list-inline-item"><p id="risk-level"></p></li>
+            <li class="list-inline-item"><a id="riskLevelInfo" tabindex="0" role="button" data-toggle="popover" data-trigger="focus"><i class="fas fa-info-circle"></i></a></li>
+          </ul>
+
+          <p>Source: Freed-Hardeman University</p>
+  
+          <div class="form-group">
+            <label for="date">Date:</label>
+            <select id="dateSelect">
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <h1 class="text-center">Current Percentage of School Affected</h1>
+
+    <div class="container my-5">
+      <div class="row">
+        <div class="col-lg-4">
+          <canvas class="my-5" id="studentsAffectedDoughnut"></canvas>
+        </div>
+        <div class="col-lg-4">
+          <canvas class="my-5" id="facultyAffectedDoughnut"></canvas>  
+        </div>
+        <div class="col-lg-4">
+          <canvas class="my-5" id="quarantinedIsolatedDoughnut"></canvas>  
+        </div>
+      </div>
+    </div>
+
+    <h1 class="text-center">Coronavirus Statistics over the Semester</h1>
+
+    <div class="container my-5">
+
+      <canvas class="my-5" id="activeStudentCasesChart"></canvas>
+      <canvas class="my-5" id="activeFacultyCasesChart"></canvas>
+      <canvas class="my-5" id="quarantinedIsolatedChart"></canvas>
+
+    </div>
+
+    <footer>
+      <div class="container text-center py-5">
+        <h1 class="text-white">&copy; Freed-Hardeman University</h1>
+      </div>
+    </footer>
+
+    
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <!-- Optional JavaScript -->
+    <script src="main.js"></script>
+
+  </body>
+</html>
