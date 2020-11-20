@@ -1,9 +1,13 @@
 const totalStudents = 1132;
 const totalFacultyStaff = 300;
+var sheetUrl = 'https://spreadsheets.google.com/feeds/cells/1XJBCL5aTxpPcfBQhfyDqqAKglcZcnN-srGsZc-P2Sq0/1/public/full?alt=json';
+
+let data = []
+
 
 $(function () {
 
-    getDates();
+    //getDates();
     getData();
 
     $("#riskLevelInfo").hover(function () {
@@ -17,26 +21,37 @@ $(function () {
     });
 
     $("#dateSelect").change(function () {
-        getData();
+        //getData();
+
+        let index = getIndex(data);
+        console.log(index)
+        let current = data[index];
+        showStats(current);
+        updateCharts(current);
+        //let values = Object.values(current);
+        //let values = Object.values(data);
+        //getValues(values);
     });
 
 });
 
 async function getDates() {
-    let response = await fetch("https://sheet.best/api/sheets/bf9fbbc3-aac1-48f4-98f2-7715cbb6d295");
-    let data = await response.json();
-    let values = Object.values(data);
-    for (i = data.length - 1; i >= 0; i--) {
-        if (values[i].id == null || values[i].date == null || values[i].activeCasesStudent == null || values[i].activeCasesFacultyStaff == null || values[i].isolated == null || values[i].quarantined == null || values[i].riskLevel == null) {
-            continue;
-        }
-        else {
-            $("#dateSelect").append(new Option(values[i].date));
-        }
-    };
+    //let response = await fetch("https://sheet.best/api/sheets/bf9fbbc3-aac1-48f4-98f2-7715cbb6d295");
+    //let data = await response.json();
+    //let values = Object.values(data);
+
+
+
+    // for (i = data.length - 1; i >= 0; i--) {
+    //     if (values[i].id == null || values[i].date == null || values[i].activeCasesStudent == null || values[i].activeCasesFacultyStaff == null || values[i].isolated == null || values[i].quarantined == null || values[i].riskLevel == null) {
+    //         continue;
+    //     }
+    //     else {
+    //         $("#dateSelect").append(new Option(values[i].date));
+    //     }
+    // };
 };
 
-var sheetUrl = 'https://spreadsheets.google.com/feeds/cells/1XJBCL5aTxpPcfBQhfyDqqAKglcZcnN-srGsZc-P2Sq0/1/public/full?alt=json';
 
 async function getData() {
     // let response = await fetch("https://sheet.best/api/sheets/bf9fbbc3-aac1-48f4-98f2-7715cbb6d295");
@@ -45,44 +60,51 @@ async function getData() {
     // let current = data[index];
     // let values = Object.values(current);
 
-
     let response = await fetch(sheetUrl);
     let sheetData = await response.json();
     let entry = sheetData.feed.entry;
-    console.log(entry);
-    
-    let data = [];
     let numCols = 7;
 
-    for(let i = numCols; i < entry.length; i+=numCols){
-        data.push( {
+    let dateSelect = $("#dateSelect");
+
+    for (let i = numCols; i < entry.length; i += numCols) {
+        data.push({
             id: entry[i].content.$t,
-            date: entry[i+1].content.$t,
+            date: entry[i + 1].content.$t,
             activeCasesStudent: parseInt(entry[i + 2].content.$t),
             activeCasesFacultyStaff: parseInt(entry[i + 3].content.$t),
             isolated: parseInt(entry[i + 4].content.$t),
-            quarantined: parseInt(entry[i+5].content.$t),
-            riskLevel : entry[i + 6].content.$t
-         } );  
-    }
+            quarantined: parseInt(entry[i + 5].content.$t),
+            riskLevel: entry[i + 6].content.$t
+        });
+        let date = entry[i + 1].content.$t;
+        dateSelect.prepend(new Option(date));
+    }  
 
-    console.log(data);
-    
-    let values = Object.values(data);
-    getValues(values);
+
+    //console.log(data);
+    let index = data.length - 1;
+    let current = data[index];
+    console.log(current);
+
+    dateSelect.val(index);  
+
+    //let values = Object.values(current);
+    //let values = Object.values(data);
+    showStats(current);
     drawCharts(data);
 };
 
 
 
-function getValues(values) {
-    $("#date").html(values[1]);
-    $("#active-cases-student").html(values[2]);
-    $("#active-cases-faculty-staff").html(values[3]);
-    $("#isolated").html(values[4]);
-    $("#quarantined").html(values[5]);
-    $("#risk-level").html("Risk Level: " + values[6]);
-    setColor(values[6]);
+function showStats(stats) {
+    $("#date").html(stats.date);
+    $("#active-cases-student").html(stats.activeCasesStudent);
+    $("#active-cases-faculty-staff").html(stats.activeCasesFacultyStaff);
+    $("#isolated").html(stats.isolated);
+    $("#quarantined").html(stats.quarantined);
+    $("#risk-level").html("Risk Level: " + stats.riskLevel);
+    setColor(stats.riskLevel);
 };
 
 function getIndex(data) {
@@ -111,6 +133,10 @@ function setColor(color) {
     }
 };
 
+function updateCharts(currentData) {
+    
+}
+
 function drawCharts(input) {
 
     let currentActiveStudentCases = input[input.length - 1].activeCasesStudent;
@@ -127,12 +153,9 @@ function drawCharts(input) {
         datesList.push(element.date);
     });
 
-    // Total number of students = 1132
-    // Total number of faculty = 300
-
     var studentsAffectedDoughnut = document.getElementById("studentsAffectedDoughnut");
     var myDoughnut1 = new Chart(studentsAffectedDoughnut, {
-        type: 'pie',
+        type: 'doughnut',
         data: {
             labels: ['Current Student Active Cases', 'Total Students'],
             datasets: [{
@@ -148,7 +171,7 @@ function drawCharts(input) {
 
     var facultyAffectedDoughnut = document.getElementById("facultyAffectedDoughnut");
     var myDoughnut2 = new Chart(facultyAffectedDoughnut, {
-        type: 'pie',
+        type: 'doughnut',
         data: {
             labels: ['Current Faculty/Staff Active Cases', 'Total Faculty/Staff'],
             datasets: [{
