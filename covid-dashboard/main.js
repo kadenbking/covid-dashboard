@@ -49,7 +49,6 @@ async function getData() {
     let response = await fetch(sheetUrl);
     let sheetData = await response.json();
     let entry = sheetData.feed.entry;
-    console.log(entry);
     
     let data = [];
     let numCols = 7;
@@ -66,9 +65,9 @@ async function getData() {
          } );  
     }
 
-    console.log(data);
-    
-    let values = Object.values(data);
+    let index = getIndex(data);
+    let current = data[index];
+    let values = Object.values(current);
     getValues(values);
     drawCharts(data);
 };
