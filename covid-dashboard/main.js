@@ -2,8 +2,8 @@ const totalStudents = 1132;
 const totalFacultyStaff = 300;
 var sheetUrl = 'https://spreadsheets.google.com/feeds/cells/1XJBCL5aTxpPcfBQhfyDqqAKglcZcnN-srGsZc-P2Sq0/1/public/full?alt=json';
 
-let data = []
-
+let data = [];
+let numCols = 7;
 
 $(function () {
 
@@ -20,20 +20,28 @@ $(function () {
         $(this).popover('hide');
     });
 
-    $("#dateSelect").change(function () {
-        //getData();
-
-        let index = getIndex(data);
-        console.log(index)
-        let current = data[index];
+    $("#dateSelect").change( function () {
+        const selectedDate = $("#dateSelect").val();
+        console.log(selectedDate);
+        
+        const current = rowForDate(selectedDate);
+        
         showStats(current);
-        updateCharts(current);
-        //let values = Object.values(current);
-        //let values = Object.values(data);
-        //getValues(values);
+        drawDonutCharts();
+        
     });
-
 });
+
+function rowForDate(date) {  
+    
+    for(let i=0; i < data.length; i++) {
+        if(data[i].date == date) {
+            return data[i];
+        }
+    }
+    
+    return null;
+}
 
 async function getDates() {
     //let response = await fetch("https://sheet.best/api/sheets/bf9fbbc3-aac1-48f4-98f2-7715cbb6d295");
@@ -54,17 +62,10 @@ async function getDates() {
 
 
 async function getData() {
-    // let response = await fetch("https://sheet.best/api/sheets/bf9fbbc3-aac1-48f4-98f2-7715cbb6d295");
-    // let data = await response.json();
-    // let index = getIndex(data);
-    // let current = data[index];
-    // let values = Object.values(current);
-
     let response = await fetch(sheetUrl);
     let sheetData = await response.json();
     let entry = sheetData.feed.entry;
-    let numCols = 7;
-
+  
     let dateSelect = $("#dateSelect");
 
     for (let i = numCols; i < entry.length; i += numCols) {
@@ -81,23 +82,18 @@ async function getData() {
         dateSelect.prepend(new Option(date));
     }  
 
+    $("#dateSelect")[0].selectedIndex = 0;
+    const current = rowForDate($("#dateSelect").val());
 
-    //console.log(data);
-    let index = data.length - 1;
-    let current = data[index];
-    console.log(current);
-
-    dateSelect.val(index);  
-
-    //let values = Object.values(current);
-    //let values = Object.values(data);
     showStats(current);
-    drawCharts(data);
-};
+    drawDonutCharts();
+    drawLineCharts();
+}
 
 
 
 function showStats(stats) {
+    console.log(stats);
     $("#date").html(stats.date);
     $("#active-cases-student").html(stats.activeCasesStudent);
     $("#active-cases-faculty-staff").html(stats.activeCasesFacultyStaff);
@@ -105,18 +101,19 @@ function showStats(stats) {
     $("#quarantined").html(stats.quarantined);
     $("#risk-level").html("Risk Level: " + stats.riskLevel);
     setColor(stats.riskLevel);
-};
+}
 
-function getIndex(data) {
+function getIndex() {
     let date = $("#dateSelect").val();
     let index = data.length - 1;
 
     for (i = data.length - 1; i >= 0; i--) {
-        if (date == data[i].date) index = (data[i].id - 1);
-    };
+        if (date == data[i].date) 
+            index = (data[i].id - 1);
+    }
 
     return index;
-};
+}
 
 function setColor(color) {
     if (color == "Green") {
@@ -131,35 +128,24 @@ function setColor(color) {
     else if (color == "Red") {
         $(".bilboard h2").addClass("red");
     }
-};
-
-function updateCharts(currentData) {
-    
 }
 
-function drawCharts(input) {
 
-    let currentActiveStudentCases = input[input.length - 1].activeCasesStudent;
-    let currentActiveFacultyCases = input[input.length - 1].activeCasesFacultyStaff;
-    let currentTotalQuarantinedIsolated = +input[input.length - 1].quarantined + +input[input.length - 1].isolated;
-    let activeStudentCasesList = [];
-    let activeFacultyCasesList = [];
-    let quarantinedIsolatedList = [];
-    let datesList = [];
-    input.forEach(element => {
-        activeStudentCasesList.push(element.activeCasesStudent);
-        activeFacultyCasesList.push(element.activeCasesFacultyStaff);
-        quarantinedIsolatedList.push(+element.quarantined + +element.isolated);
-        datesList.push(element.date);
-    });
+function drawDonutCharts() {
+    const currentRow = rowForDate( $("#dateSelect").val());
+
+    let currentActiveStudentCases = currentRow.activeCasesStudent;
+    let currentActiveFacultyCases = currentRow.activeCasesFacultyStaff;
+    let currentTotalQuarantinedIsolated = currentRow.quarantined + currentRow.isolated;
+
 
     var studentsAffectedDoughnut = document.getElementById("studentsAffectedDoughnut");
     var myDoughnut1 = new Chart(studentsAffectedDoughnut, {
         type: 'doughnut',
         data: {
-            labels: ['Current Student Active Cases', 'Total Students'],
+            labels: ['Student Active Cases', 'Total'],
             datasets: [{
-                data: [currentActiveStudentCases, totalStudents],
+                data: [currentActiveStudentCases, totalStudents-currentActiveStudentCases],
                 backgroundColor: [
                     '#ffd301',
                     '#815558'
@@ -173,9 +159,9 @@ function drawCharts(input) {
     var myDoughnut2 = new Chart(facultyAffectedDoughnut, {
         type: 'doughnut',
         data: {
-            labels: ['Current Faculty/Staff Active Cases', 'Total Faculty/Staff'],
+            labels: ['Faculty/Staff Active Cases', 'Total'],
             datasets: [{
-                data: [currentActiveFacultyCases, totalFacultyStaff],
+                data: [currentActiveFacultyCases, totalFacultyStaff-currentActiveFacultyCases],
                 backgroundColor: [
                     '#ffd301',
                     '#815558'
@@ -189,9 +175,9 @@ function drawCharts(input) {
     var myDoughnut3 = new Chart(quarantinedIsolatedDoughnut, {
         type: 'doughnut',
         data: {
-            labels: ['Total in Quarantine or Isolation', 'Total On Campus'],
+            labels: ['People in Quarantine or Isolation'],
             datasets: [{
-                data: [currentTotalQuarantinedIsolated, 1132 + 300],
+                data: [currentTotalQuarantinedIsolated, totalStudents+totalFacultyStaff-currentTotalQuarantinedIsolated],
                 backgroundColor: [
                     '#ffd301',
                     '#815558'
@@ -200,6 +186,29 @@ function drawCharts(input) {
             }]
         }
     });
+
+
+}
+
+function drawLineCharts() {
+
+    let activeStudentCasesList = [];
+    let activeFacultyCasesList = [];
+    let isolatedList = [];
+    let quarantinedList = [];
+    let quarantinedIsolatedList = [];
+    let datesList = [];
+
+    data.forEach(element => {
+        activeStudentCasesList.push(element.activeCasesStudent);
+        activeFacultyCasesList.push(element.activeCasesFacultyStaff);
+        isolatedList.push(element.isolated);
+        quarantinedList.push(element.quarantined);
+        quarantinedIsolatedList.push(+element.quarantined + element.isolated);
+        datesList.push(element.date);
+    });
+
+    
 
     var activeStudentCasesChart = document.getElementById('activeStudentCasesChart');
     var myChart1 = new Chart(activeStudentCasesChart, {
@@ -258,13 +267,23 @@ function drawCharts(input) {
         type: 'line',
         data: {
             labels: datesList,
-            datasets: [{
-                label: 'Total in Quarantine or Isolation',
-                data: quarantinedIsolatedList,
-                pointBackgroundColor: '#815558',
-                pointBorderColor: 'rgb(128,0,0)',
-                backgroundColor: '#815558',
-                borderColor: 'rgb(128,0,0)',
+            datasets: [
+                {
+                    label: 'Total in Isolation',
+                    data: isolatedList,
+                    pointBackgroundColor: '#ffd30188',
+                    pointBorderColor: '#ffd301',
+                    backgroundColor: '#ffd30188',
+                    borderColor: '#ffd301',
+                    borderWidth: 3
+                },
+                {
+                label: 'Total in Quarantine',
+                data: quarantinedList,
+                pointBackgroundColor: '#800000',
+                pointBorderColor: '#815558aa',
+                backgroundColor: '#815558aa',
+                borderColor: '#800000',
                 borderWidth: 3
             }]
         },
@@ -278,5 +297,5 @@ function drawCharts(input) {
             }
         }
     });
-};
+}
 
